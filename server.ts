@@ -1161,7 +1161,7 @@ app.post("/api/tts", async (req, res) => {
 // Fish Audio TTS endpoint (s2.1-pro-free model with custom reference voice and contextual expression system)
 // ...your other API routes above...
 
-
+// Fish Audio TTS endpoint
 app.post("/api/tts/fish", async (req, res) => {
   try {
     const {
@@ -1179,6 +1179,7 @@ app.post("/api/tts/fish", async (req, res) => {
 
     if (!fishApiKey) {
       console.error("FISH_AUDIO_API_KEY is missing");
+
       return res.status(500).json({
         error: "Fish Audio API key is not configured",
       });
@@ -1186,7 +1187,10 @@ app.post("/api/tts/fish", async (req, res) => {
 
     const cleanText = text
       .replace(/^\[.*?\]\s*/g, "")
-      .replace(/\((whispering|sighing|laughing|panting|shouting)\)/gi, "")
+      .replace(
+        /\((whispering|sighing|laughing|panting|shouting)\)/gi,
+        ""
+      )
       .replace(/\*[^*]+\*/g, "")
       .trim();
 
@@ -1207,14 +1211,20 @@ app.post("/api/tts/fish", async (req, res) => {
     if (!fishResponse.ok) {
       const errorText = await fishResponse.text();
 
-      console.error("Fish Audio error:", fishResponse.status, errorText);
+      console.error(
+        "Fish Audio error:",
+        fishResponse.status,
+        errorText
+      );
 
       return res.status(fishResponse.status).json({
         error: `Fish Audio request failed: ${errorText}`,
       });
     }
 
-    const audioBuffer = Buffer.from(await fishResponse.arrayBuffer());
+    const audioBuffer = Buffer.from(
+      await fishResponse.arrayBuffer()
+    );
 
     return res.json({
       audio: audioBuffer.toString("base64"),
@@ -1232,5 +1242,7 @@ app.post("/api/tts/fish", async (req, res) => {
 
 // Start server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
+  console.log(
+    `VRM AI Assistant server listening on http://0.0.0.0:${PORT}`
+  );
 });
