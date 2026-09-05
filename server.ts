@@ -1159,52 +1159,36 @@ app.post("/api/tts", async (req, res) => {
 });
 
 // Fish Audio TTS endpoint (s2.1-pro-free model with custom reference voice and contextual expression system)
+// ...your other API routes above...
+
+
 app.post("/api/tts/fish", async (req, res) => {
   try {
     const {
       text,
       reference_id = "f2aed07c91614db28daaaa849150cc6e",
-      expression,
-      voice_direction,
+      expression = "",
+      voice_direction = "",
     } = req.body;
 
-    if (!text) {
-      return res.status(400).json({ error: "Missing text parameter" });
+    if (!text || typeof text !== "string") {
+      return res.status(400).json({ error: "Text is required" });
     }
-
-    // Clean spoken text so metadata is not read literally
-    const speechText = text
-      .replace(/^\[.*?\]\s*/gi, "")
-      .replace(/\((whispering|sighing|laughing|panting|shouting)\)/gi, "")
-      .replace(/\*[^*]+\*/g, " ")
-      .replace(/[*_#`~[\]]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    if (!speechText) {
-      return res.status(400).json({ error: "No spoken text remaining after cleanup" });
-    }
-
-    // Format Fish Audio contextual prompt with expression / voice direction if provided
-    const prefixTags: string[] = [];
-    if (expression && typeof expression === "string" && expression.trim()) {
-      const exp = expression.trim();
-      prefixTags.push(exp.startsWith("[") && exp.endsWith("]") ? exp : `[${exp}]`);
-    }
-    if (voice_direction && typeof voice_direction === "string" && voice_direction.trim()) {
-      const vd = voice_direction.trim();
-      prefixTags.push(vd.startsWith("(") && vd.endsWith(")") ? vd : `(${vd})`);
-    }
-
-    const fishPromptText = prefixTags.length > 0 ? `${prefixTags.join(" ")} ${speechText}` : speechText;
 
     const fishApiKey = process.env.FISH_AUDIO_API_KEY;
 
     if (!fishApiKey) {
-  return res.status(500).json({
-    error: "FISH_AUDIO_API_KEY is not configured."
-  });
-}
+      console.error("FISH_AUDIO_API_KEY is missing");
+      return res.status(500).json({
+        error: "Fish Audio API key is not configured",
+      });
+    }
+
+    const cleanText = text
+      .replace(/^\[.*?\]\s*/g, "")
+      .replace(/\((whispering|sighing|laughing|panting|shouting)\)/gi, "")
+      .replace(/\*[^*]+\*/g, "")
+      .trim();
 
     const fishResponse = await fetch("https://api.fish.audio/v1/tts", {
       method: "POST",
@@ -1214,52 +1198,43 @@ app.post("/api/tts/fish", async (req, res) => {
         model: "s2.1-pro-free",
       },
       body: JSON.stringify({
-        text: fishPromptText,
-        reference_id: reference_id,
+        text: cleanText,
+        reference_id,
         format: "mp3",
       }),
     });
 
     if (!fishResponse.ok) {
-      const errText = await fishResponse.text();
-      console.warn("Fish Audio API error:", fishResponse.status, errText);
-      return res.status(200).json({
-        available: false,
-        fallback: true,
-        error: `Fish Audio error (${fishResponse.status}): ${errText}`,
+      const errorText = await fishResponse.text();
+
+      console.error("Fish Audio error:", fishResponse.status, errorText);
+
+      return res.status(fishResponse.status).json({
+        error: `Fish Audio request failed: ${errorText}`,
       });
     }
 
-    const arrayBuffer = await fishResponse.arrayBuffer();
-    const base64Audio = Buffer.from(arrayBuffer).toString("base64");
+    const audioBuffer = Buffer.from(await fishResponse.arrayBuffer());
 
-    res.json({
-      audio: base64Audio,
+    return res.json({
+      audio: audioBuffer.toString("base64"),
       format: "mp3",
       contentType: "audio/mpeg",
     });
   } catch (error: any) {
-    console.error("Fish Audio TTS endpoint exception:", error);
-    res.status(500).json({
-      error: error.message || "Failed to generate Fish Audio speech",
+    console.error("Fish TTS error:", error);
+
+    return res.status(500).json({
+      error: error?.message || "Fish Audio TTS failed",
     });
   }
 });
 
-async function startServer() {
-  // Vite middleware in dev or static files in prod
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+
+// KEEP THIS AT THE VERY END
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
+});
   }
 
   app.listen(PORT, "0.0.0.0", () => {
