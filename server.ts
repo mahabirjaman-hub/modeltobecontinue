@@ -1201,12 +1201,10 @@ app.post("/api/tts/fish", async (req, res) => {
     const fishApiKey = process.env.FISH_AUDIO_API_KEY;
 
     if (!fishApiKey) {
-      return res.status(200).json({
-        available: false,
-        fallback: true,
-        message: "FISH_AUDIO_API_KEY is not configured. Falling back to browser speech synthesis.",
-      });
-    }
+  return res.status(500).json({
+    error: "FISH_AUDIO_API_KEY is not configured."
+  });
+}
 
     const fishResponse = await fetch("https://api.fish.audio/v1/tts", {
       method: "POST",
