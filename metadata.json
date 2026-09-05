@@ -1,0 +1,6 @@
+{
+  "name": "VRM 3D AI Assistant",
+  "description": "Interactive 3D virtual companion bringing Columbina Hyposelenia (Moon Maiden / Trilune Goddess) to life with persistent VRM humanoid rendering, OpenAI intelligence, voice synthesis, lip-sync, and expressive animations.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
