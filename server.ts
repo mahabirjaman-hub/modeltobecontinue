@@ -1221,7 +1221,7 @@ app.post("/api/tts/fish", async (req, res) => {
       format: "mp3",
       contentType: "audio/mpeg",
     });
-    } catch (error: any) {
+      } catch (error: any) {
     console.error("Fish TTS error:", error);
 
     return res.status(500).json({
