@@ -1221,13 +1221,16 @@ app.post("/api/tts/fish", async (req, res) => {
       format: "mp3",
       contentType: "audio/mpeg",
     });
-  } catch (error: any) {
+    } catch (error: any) {
     console.error("Fish TTS error:", error);
 
     return res.status(500).json({
       error: error?.message || "Fish Audio TTS failed",
     });
   }
+});
+
+// Start server
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
 });
