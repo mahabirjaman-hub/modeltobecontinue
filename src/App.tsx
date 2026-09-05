@@ -93,7 +93,7 @@ function detectLanguageSwitch(text: string): ColumbinaLanguage | null {
   return null;
 }
 
-const DEFAULT_VRM_URL = 'https://files.catbox.moe/r6x4ad.vrm';
+const DEFAULT_VRM_URL = '/columbinamodel.vrm';
 
 const INITIAL_CONFIG: AssistantConfig = {
   aiBrain: 'gemini',
