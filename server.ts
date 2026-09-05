@@ -1198,8 +1198,7 @@ app.post("/api/tts/fish", async (req, res) => {
 
     const fishPromptText = prefixTags.length > 0 ? `${prefixTags.join(" ")} ${speechText}` : speechText;
 
-    const fishApiKey =
-      process.env.FISH_AUDIO_API_KEY || "sk-fish-fzcNbLPO2rx-iulCuLYu-2PFEIzZY3oeOzKFZ-VQ554";
+    const fishApiKey = process.env.FISH_AUDIO_API_KEY;
 
     if (!fishApiKey) {
       return res.status(200).json({
