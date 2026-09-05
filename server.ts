@@ -1242,7 +1242,5 @@ app.post("/api/tts/fish", async (req, res) => {
 
 // Start server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `VRM AI Assistant server listening on http://0.0.0.0:${PORT}`
-  );
+  console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
 });
