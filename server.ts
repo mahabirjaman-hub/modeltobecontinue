@@ -1228,17 +1228,6 @@ app.post("/api/tts/fish", async (req, res) => {
       error: error?.message || "Fish Audio TTS failed",
     });
   }
-});
-
-
-// KEEP THIS AT THE VERY END
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
 });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`VRM AI Assistant server listening on http://0.0.0.0:${PORT}`);
-  });
-
-startServer();
